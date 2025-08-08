@@ -1,0 +1,3 @@
+/* src/index.css – minimal, no globals */
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
