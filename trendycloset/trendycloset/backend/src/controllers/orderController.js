@@ -100,7 +100,7 @@ exports.confirmOrder = async (req, res) => {
 
 function buildReceiptHtml(order) {
   const rows = order.items.map(i =>
-    `<tr><td>${i.title}</td><td style="text-align:right">${i.qty}</td><td style="text-align:right">$${i.priceAtPurchase.toFixed(2)}</td><td style="text-align:right">$${i.subtotal.toFixed(2)}</td></tr>`
+    `<tr><td>${i.title}</td><td style="text-align:right">${i.qty}</td><td style="text-align:right">£${i.priceAtPurchase.toFixed(2)}</td><td style="text-align:right">£${i.subtotal.toFixed(2)}</td></tr>`
   ).join('');
   return `
   <div style="font-family:Arial,sans-serif">
@@ -109,7 +109,7 @@ function buildReceiptHtml(order) {
     <table width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse">
       <thead><tr><th align="left">Item</th><th align="right">Qty</th><th align="right">Price</th><th align="right">Subtotal</th></tr></thead>
       <tbody>${rows}</tbody>
-      <tfoot><tr><td colspan="3" align="right"><b>Total</b></td><td align="right"><b>$${order.total.toFixed(2)}</b></td></tr></tfoot>
+      <tfoot><tr><td colspan="3" align="right"><b>Total</b></td><td align="right"><b>£ ${order.total.toFixed(2)}</b></td></tr></tfoot>
     </table>
     <p>Status: ${order.status}</p>
     <p>Thanks for shopping at TrendyCloset!</p>

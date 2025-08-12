@@ -160,7 +160,7 @@ export default function DashboardUser() {
                 ))}
               </ul>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
-                <div><b>Total:</b> ${total.toFixed(2)}</div>
+                <div><b>Total:</b>£ {total.toFixed(2)}</div>
                 <button onClick={placeOrder}>Place Order</button>
               </div>
             </div>

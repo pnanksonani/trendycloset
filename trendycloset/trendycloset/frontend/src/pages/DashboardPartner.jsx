@@ -217,7 +217,7 @@ export default function DashboardPartner() {
                         <div className="font-semibold truncate">{p.title}</div>
                         <div className="text-sm text-zinc-500 line-clamp-2">{p.description || '—'}</div>
                         <div className="mt-1 text-sm">
-                          <span className="font-semibold">${Number(p.price || 0).toFixed(2)}</span>
+                          <span className="font-semibold">£{Number(p.price || 0).toFixed(2)}</span>
                           <span className="text-zinc-500"> • stock: {p.stock ?? 0}</span>
                         </div>
                       </div>
@@ -273,8 +273,8 @@ export default function DashboardPartner() {
                               <tr key={idx} className="border-t border-zinc-100">
                                 <td className="py-2">{i.title}</td>
                                 <td className="py-2 text-right">{i.qty}</td>
-                                <td className="py-2 text-right">${Number(i.priceAtPurchase || 0).toFixed(2)}</td>
-                                <td className="py-2 text-right">${Number(i.subtotal || 0).toFixed(2)}</td>
+                                <td className="py-2 text-right">£{Number(i.priceAtPurchase || 0).toFixed(2)}</td>
+                                <td className="py-2 text-right">£{Number(i.subtotal || 0).toFixed(2)}</td>
                               </tr>
                             ))}
                           </tbody>
