@@ -7,6 +7,9 @@ const {
   resendOtp,
   login,
   logout,
+  forgotPassword,
+  verifyForgotPasswordOtp,
+  resetPassword,
 } = require('../controllers/authController');
 const { requireAuth } = require('../middlewares/requireAuth');
 const { requireRole } = require('../middlewares/requireRole');
@@ -20,6 +23,11 @@ router.post('/verify-otp', rateLimit(10, 60_000), verifyOtp);
 router.post('/resend-otp', rateLimit(3, 60_000), resendOtp);
 router.post('/login', rateLimit(10, 60_000), login);
 router.post('/logout', logout);
+
+// Forgot password flow
+router.post('/forgot-password', rateLimit(3, 60_000), forgotPassword);
+router.post('/verify-forgot-password-otp', rateLimit(10, 60_000), verifyForgotPasswordOtp);
+router.post('/reset-password', rateLimit(3, 60_000), resetPassword);
 // // User-only
 // router.get('/orders', requireAuth, requireRole('USER'), listOrders);
 

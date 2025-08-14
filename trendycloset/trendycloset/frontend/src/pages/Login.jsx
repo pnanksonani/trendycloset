@@ -34,8 +34,8 @@ export default function Login(){
         captchaAnswer: captcha.answer,
         captchaToken: captcha.token,
       });
-      if (res?.role === 'PARTNER') nav('/dashboard/partner', { replace: true });
-      else nav('/dashboard/user', { replace: true });
+      if (res?.role === 'PARTNER') nav('/partner/products', { replace: true });
+      else nav('/products', { replace: true });
     } catch (err) {
       setMsg(err?.message || 'Login failed');
     } finally { setLoading(false); }
@@ -117,8 +117,14 @@ export default function Login(){
             </div>
 
             <div className="flex items-center justify-center gap-2 text-sm text-zinc-600">
-              <span>Didn’t get the OTP?</span>
+              <span>Didn't get the OTP?</span>
               <Link to="/verify" className="text-indigo-600 hover:underline">Verify email / Resend OTP</Link>
+            </div>
+
+            <div className="flex items-center justify-center">
+              <Link to="/forgot-password" className="text-indigo-600 hover:underline text-sm">
+                Forgot your password?
+              </Link>
             </div>
           </form>
         </div>

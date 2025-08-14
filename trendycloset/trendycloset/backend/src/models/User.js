@@ -34,6 +34,10 @@ const userSchema = new Schema(
     // OTP for email verification
     otpHash: { type: String, default: null },
     otpExpiresAt: { type: Date, default: null },
+
+    // OTP for password reset
+    forgotPasswordOtpHash: { type: String, default: null },
+    forgotPasswordOtpExpiresAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
@@ -43,6 +47,7 @@ userSchema.set('toJSON', {
   transform(_doc, ret) {
     delete ret.passwordHash;
     delete ret.otpHash;
+    delete ret.forgotPasswordOtpHash;
     delete ret.__v;
     return ret;
   },
