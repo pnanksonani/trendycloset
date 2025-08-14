@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { registerSchema, loginSchema, verifyOtpSchema } = require('../validators/authSchemas');
+const { registerSchema, loginSchema, verifyOtpSchema, forgotPasswordSchema, verifyForgotPasswordOtpSchema, resetPasswordSchema } = require('../validators/authSchemas');
 const { generateOTP, hashValue } = require('../utils/otp');
 const { hashPassword, verifyPassword } = require('../utils/password');
 const { sendMail } = require('../utils/mailer');
@@ -141,4 +141,75 @@ exports.login = async (req, res) => {
 exports.logout = async (_req, res) => {
   res.clearCookie('access_token');
   return res.json({ message: 'Logged out' });
+};
+
+// POST /api/auth/forgot-password
+exports.forgotPassword = async (req, res) => {
+  const parsed = forgotPasswordSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const { email } = parsed.data;
+  const user = await User.findOne({ email });
+  
+  // Don't reveal if user exists or not for security
+  if (!user) {
+    return res.json({ message: 'If an account with this email exists, a password reset OTP has been sent.' });
+  }
+
+  // Generate OTP for password reset
+  const otp = generateOTP(6);
+  user.forgotPasswordOtpHash = hashValue(otp);
+  user.forgotPasswordOtpExpiresAt = new Date(Date.now() + (Number(process.env.OTP_TTL_MINUTES || 10) * 60 * 1000));
+  await user.save();
+
+  await sendMail(
+    email,
+    'Reset your TrendyCloset password',
+    `<p>Your password reset OTP is <b>${otp}</b>. It expires in ${process.env.OTP_TTL_MINUTES || 10} minutes.</p>
+     <p>If you didn't request this, please ignore this email.</p>`
+  );
+
+  return res.json({ message: 'If an account with this email exists, a password reset OTP has been sent.' });
+};
+
+// POST /api/auth/verify-forgot-password-otp
+exports.verifyForgotPasswordOtp = async (req, res) => {
+  const parsed = verifyForgotPasswordOtpSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const { email, otp } = parsed.data;
+  const user = await User.findOne({ email });
+  if (!user || !user.forgotPasswordOtpHash) return res.status(400).json({ error: 'Invalid request' });
+
+  if (user.forgotPasswordOtpExpiresAt && user.forgotPasswordOtpExpiresAt.getTime() < Date.now())
+    return res.status(400).json({ error: 'OTP expired' });
+
+  if (hashValue(otp) !== user.forgotPasswordOtpHash)
+    return res.status(400).json({ error: 'Incorrect OTP' });
+
+  return res.json({ message: 'OTP verified successfully. You can now reset your password.' });
+};
+
+// POST /api/auth/reset-password
+exports.resetPassword = async (req, res) => {
+  const parsed = resetPasswordSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
+
+  const { email, otp, newPassword } = parsed.data;
+  const user = await User.findOne({ email });
+  if (!user || !user.forgotPasswordOtpHash) return res.status(400).json({ error: 'Invalid request' });
+
+  if (user.forgotPasswordOtpExpiresAt && user.forgotPasswordOtpExpiresAt.getTime() < Date.now())
+    return res.status(400).json({ error: 'OTP expired' });
+
+  if (hashValue(otp) !== user.forgotPasswordOtpHash)
+    return res.status(400).json({ error: 'Incorrect OTP' });
+
+  // Update password and clear OTP
+  user.passwordHash = await hashPassword(newPassword);
+  user.forgotPasswordOtpHash = null;
+  user.forgotPasswordOtpExpiresAt = null;
+  await user.save();
+
+  return res.json({ message: 'Password reset successfully. You can now login with your new password.' });
 };
