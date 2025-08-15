@@ -1,45 +1,59 @@
+// src/components/Navbar.jsx
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
+import logo from '../assets/logo.jpg';
 
 export default function Navbar() {
-  const { user, username, role, logout } = useAuth() || {};
+  const auth = useAuth();
+  if (!auth) return null;
+  const { user, username, role, logout } = auth;
   const loc = useLocation();
 
   const [unread, setUnread] = useState(0);
   const [cartCount, setCartCount] = useState(0);
 
-  // fetch small counts (cheap) whenever route changes or auth changes
+  // fetch small counts whenever route or auth changes
   useEffect(() => {
     let cancelled = false;
-
     (async () => {
-      try {
-        if (!user) {
-          if (!cancelled) { setUnread(0); setCartCount(0); }
-          return;
+      if (!user) {
+        if (!cancelled) {
+          setUnread(0);
+          setCartCount(0);
         }
+        return;
+      }
+      const tasks = [];
 
-        // notifications (works for both roles; user sees ORDER_CONFIRMED etc.)
-        try {
-          const r = await api('/notifications');
-          if (!cancelled) setUnread((r.items || []).filter(n => !n.read).length);
-        } catch (_) {}
+      // notifications
+      tasks.push(
+        api('/notifications')
+          .then(r => {
+            if (!cancelled) setUnread((r.items || []).filter(n => !n.read).length);
+          })
+          .catch(() => {})
+      );
 
-        // cart count (only meaningful for USER)
-        if (role === 'USER') {
-          try {
-            const c = await api('/user/cart');
-            if (!cancelled) setCartCount((c.items || []).length);
-          } catch (_) {}
-        } else {
-          if (!cancelled) setCartCount(0);
-        }
-      } catch (_) {}
+      // cart count for users
+      if (role === 'USER') {
+        tasks.push(
+          api('/user/cart')
+            .then(c => {
+              if (!cancelled) setCartCount((c.items || []).length);
+            })
+            .catch(() => {})
+        );
+      } else {
+        if (!cancelled) setCartCount(0);
+      }
+
+      await Promise.allSettled(tasks);
     })();
-
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user, role, loc.pathname]);
 
   const btnGhost =
@@ -56,15 +70,15 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white/85 backdrop-blur border-b border-zinc-200">
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* brand */}
-        <Link
-          to="/"
-          className="text-2xl font-black bg-gradient-to-br from-indigo-500 to-purple-600 bg-clip-text text-transparent"
-        >
-          TrendyCloset
+        {/* Logo + brand */}
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="TrendyCloset" className="h-8 w-auto" />
+          <span className="text-2xl font-black bg-gradient-to-br from-indigo-500 to-purple-600 bg-clip-text text-transparent">
+            TrendyCloset
+          </span>
         </Link>
 
-        {/* center nav */}
+        {/* Center nav */}
         <nav className="hidden sm:flex items-center gap-3 text-sm">
           <NavItem to="/products">Products</NavItem>
           {role === 'USER' && (
@@ -88,31 +102,39 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* right side actions */}
+        {/* Right side actions */}
         <div className="flex items-center gap-2">
           {!user ? (
             <>
-              <Link to="/login" className={btnGhost}>Login</Link>
-              <Link to="/signup/user" className={btnPrimary}>Sign Up</Link>
+              <Link to="/login" className={btnGhost}>
+                Login
+              </Link>
+              <Link to="/signup/user" className={btnPrimary}>
+                Sign Up
+              </Link>
             </>
           ) : (
             <>
               <span className="hidden md:block text-sm text-zinc-600">
                 Hi, <b>{username}</b>
               </span>
-              <button onClick={logout} className={btnGhost}>Logout</button>
+              <button onClick={logout} className={btnGhost}>
+                Logout
+              </button>
             </>
           )}
         </div>
       </div>
 
-      {/* mobile quick links */}
+      {/* Mobile quick links */}
       <div className="sm:hidden border-t border-zinc-200">
         <div className="max-w-6xl mx-auto px-4 py-2 flex items-center gap-3 overflow-x-auto text-sm">
           <NavItem to="/products">Products</NavItem>
           {role === 'USER' && (
             <>
-              <NavItem to="/cart">Cart {cartCount > 0 && <Badge>{cartCount}</Badge>}</NavItem>
+              <NavItem to="/cart">
+                Cart {cartCount > 0 && <Badge>{cartCount}</Badge>}
+              </NavItem>
               <NavItem to="/orders">Orders</NavItem>
             </>
           )}
@@ -133,7 +155,6 @@ export default function Navbar() {
   );
 }
 
-/* tiny helpers */
 function NavItem({ to, children }) {
   return (
     <NavLink
