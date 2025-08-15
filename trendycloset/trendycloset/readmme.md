@@ -107,7 +107,7 @@ npm install
 Create `.env`:
 
 env
-VITE_API_BASE=http://localhost:5050/api
+VITE_API_BASE=http://localhost:5173/api
 
 
 Run:

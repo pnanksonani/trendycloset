@@ -141,8 +141,8 @@ export default function PartnerOrders() {
                         <tr key={idx} className="border-t border-zinc-100">
                           <td className="py-2">{i.title}</td>
                           <td className="py-2 text-right">{i.qty}</td>
-                          <td className="py-2 text-right">${Number(i.priceAtPurchase || 0).toFixed(2)}</td>
-                          <td className="py-2 text-right">${Number(i.subtotal || 0).toFixed(2)}</td>
+                          <td className="py-2 text-right">£{Number(i.priceAtPurchase || 0).toFixed(2)}</td>
+                          <td className="py-2 text-right">£{Number(i.subtotal || 0).toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>

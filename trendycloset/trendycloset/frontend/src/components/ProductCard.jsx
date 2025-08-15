@@ -10,7 +10,7 @@ export default function ProductCard({ product, onAdd }) {
       )}
       <div style={{ fontWeight: 700 }}>{product.title}</div>
       <div style={{ color: '#666', fontSize: 13 }}>{product.description || '—'}</div>
-      <div style={{ marginTop: 6 }}>${Number(product.price || 0).toFixed(2)}</div>
+      <div style={{ marginTop: 6 }}>£{Number(product.price || 0).toFixed(2)}</div>
       <button onClick={() => onAdd?.(product)} style={btn} disabled={product.stock <= 0}>
         {product.stock > 0 ? 'Add to cart' : 'Out of stock'}
       </button>

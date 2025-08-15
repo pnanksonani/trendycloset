@@ -196,7 +196,7 @@ export default function PartnerProducts() {
                       {p.description || '—'}
                     </div>
                     <div className="mt-1 text-sm">
-                      <span className="font-semibold">${Number(p.price || 0).toFixed(2)}</span>
+                      <span className="font-semibold">£{Number(p.price || 0).toFixed(2)}</span>
                       <span className="text-zinc-500"> • stock: {p.stock}</span>
                     </div>
                   </div>
