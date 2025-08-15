@@ -1,0 +1,204 @@
+/* Reset */
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background: #fff;
+  color: #222;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Header styles */
+header {
+  width: 100%;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+  padding: 20px 3px 15px;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Mode toggle */
+.mode-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: none; 
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1001;
+  transition: color 0.3s;
+}
+body:not(.dark-mode) .mode-toggle { color: #222; }
+body.dark-mode .mode-toggle { color: #fff; }
+
+/* Brand */
+.brand {
+  font-size: 1.8em;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Nav links */
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+.nav-links a {
+  padding: 8px 16px;
+  border-radius: 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.3s, color 0.3s;
+}
+.nav-links a:hover {
+  background: #f0f0f0;
+  color: #6366f1;
+}
+
+/* Hamburger */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 8px;
+}
+
+/* Mobile nav */
+@media(max-width: 768px) {
+  .brand {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .menu-toggle {
+    display: block;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    flex-direction: column;
+    background: inherit;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+  .nav-links.show { display: flex; }
+}
+
+/* CTA */
+.cta-section { text-align: center; margin: 80px 20px; }
+.cta-button {
+  background-color: #a800a8;
+  color: #fff;
+  padding: 12px 24px;
+  margin: 10px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+.cta-button:hover { background-color: #6a006a; }
+
+/* Reviews */
+.reviews-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.section-title {
+  text-align: center;
+  font-size: 2.5em;
+  margin-bottom: 40px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* Grid */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+@media(max-width: 900px) {
+  .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width: 600px) {
+  .reviews-grid { grid-template-columns: 1fr; }
+}
+
+/* Cards */
+.review-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s, box-shadow 0.3s ease, background 0.3s;
+}
+.review-card.show { opacity: 1; transform: translateY(0); }
+.review-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Review header */
+.review-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+
+}
+.review-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+}
+.reviewer { margin-top: 10px; font-weight: 700; font-size: 1.2em; }
+
+/* Rating */
+.rating { margin-top: 8px; font-size: 1.2em; color: #FFD700; text-align: center; }
+
+/* Review text */
+.review-text { margin-top: 20px; font-size: 1em; line-height: 1.5; text-align: justify; }
+
+/* -------- DARK MODE -------- */
+body.dark-mode {
+  background-color: #222;
+  color: #eee;
+}
+body.dark-mode header { background: #333; border-bottom-color: #555; }
+body.dark-mode .nav-links { background: #333; border-color: #555; }
+body.dark-mode .nav-links a:hover { background: #444; }
+body.dark-mode .cta-button { background-color: #6a006a; }
+body.dark-mode .cta-button:hover { background-color: #4a004a; }
+body.dark-mode .review-card { background: #333; }
+body.dark-mode .review-image { border-color: #555; }
