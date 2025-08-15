@@ -71,8 +71,6 @@ export default function Products() {
             </span>
           </div>
           <nav className="flex items-center gap-3 text-sm">
-            <Link to="/login" className="text-indigo-600 hover:underline">Login</Link>
-            <Link to="/dashboard/user" className="text-zinc-700 hover:underline">User Dashboard</Link>
             <Link to="/dashboard/partner" className="text-zinc-700 hover:underline">Partner Dashboard</Link>
           </nav>
         </header>

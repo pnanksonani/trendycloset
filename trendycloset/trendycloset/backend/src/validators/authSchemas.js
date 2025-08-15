@@ -35,8 +35,29 @@ const loginSchema = z.object({
   captchaToken: z.string().min(1, 'Captcha token is required'),
 });
 
+// Forgot password: email only
+const forgotPasswordSchema = z.object({
+  email: z.string().transform((s) => s.trim().toLowerCase()),
+});
+
+// Verify forgot password OTP: email + 6-digit code
+const verifyForgotPasswordOtpSchema = z.object({
+  email: z.string().transform((s) => s.trim().toLowerCase()),
+  otp: z.string().regex(/^\d{6}$/, 'OTP must be 6 digits'),
+});
+
+// Reset password: email + otp + new password
+const resetPasswordSchema = z.object({
+  email: z.string().transform((s) => s.trim().toLowerCase()),
+  otp: z.string().regex(/^\d{6}$/, 'OTP must be 6 digits'),
+  newPassword: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
 module.exports = {
   registerSchema,
   verifyOtpSchema,
   loginSchema,
+  forgotPasswordSchema,
+  verifyForgotPasswordOtpSchema,
+  resetPasswordSchema,
 };

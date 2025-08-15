@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import QuantityInput from '../components/QuantityInput';
+import PaymentForm from '../components/PaymentForm';
 
 export default function Cart() {
   const [items, setItems] = useState([]);
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   async function load() {
     try {
@@ -45,18 +48,39 @@ export default function Cart() {
     }
   }
 
-  async function placeOrder() {
+  async function initiateCheckout() {
     if (items.length === 0) return setMsg('Your cart is empty');
+    setShowPayment(true);
+    setMsg('');
+  }
+
+  async function processPayment(paymentDetails) {
     try {
-      setLoading(true);
+      setPaymentLoading(true);
+      
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock payment validation
+      if (paymentDetails.cardNumber.replace(/\s/g, '') === '4111111111111111') {
+        throw new Error('Payment declined. Please try a different card.');
+      }
+      
+      // If payment is successful, place the order
       await api('/user/orders', { method: 'POST' });
       setItems([]);
-      setMsg('Order placed! You will receive a confirmation email when the partner approves.');
+      setShowPayment(false);
+      setMsg('Payment successful! Order placed. You will receive a confirmation email when the partner approves.');
     } catch (e) {
-      setMsg(e.message || 'Order failed');
+      setMsg(e.message || 'Payment failed. Please try again.');
     } finally {
-      setLoading(false);
+      setPaymentLoading(false);
     }
+  }
+
+  function cancelPayment() {
+    setShowPayment(false);
+    setMsg('');
   }
 
   return (
@@ -111,7 +135,7 @@ export default function Cart() {
         )}
 
         {/* Cart list + summary */}
-        {items.length > 0 && (
+        {items.length > 0 && !showPayment && (
           <div className="mt-6 grid gap-6 md:grid-cols-[1fr_360px]">
             {/* Items */}
             <ul className="grid gap-3">
@@ -184,18 +208,80 @@ export default function Cart() {
                 <span>${total.toFixed(2)}</span>
               </div>
               <button
-                onClick={placeOrder}
+                onClick={initiateCheckout}
                 disabled={loading}
                 aria-busy={loading}
                 className="mt-4 inline-flex w-full items-center justify-center rounded-xl px-5 py-3 font-semibold text-white bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm hover:shadow disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? 'Placing…' : 'Place Order'}
+                {loading ? 'Processing…' : 'Proceed to Checkout'}
               </button>
 
               <div className="mt-3 text-xs text-zinc-500">
-                You’ll get an email + in-app notification after partner confirmation.
+                You'll get an email + in-app notification after partner confirmation.
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Payment Form */}
+        {showPayment && (
+          <div className="mt-6 grid gap-6 md:grid-cols-[1fr_400px]">
+            {/* Order Summary */}
+            <div className="bg-white border border-zinc-200 rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold">Order Summary</h2>
+                <button
+                  onClick={cancelPayment}
+                  className="text-sm text-zinc-500 hover:text-zinc-700"
+                >
+                  ← Back to Cart
+                </button>
+              </div>
+              
+              <ul className="space-y-3">
+                {items.map((c, idx) => (
+                  <li key={c.productId || c._id || idx} className="flex items-center gap-3">
+                    {/* Image */}
+                    {c.imageUrl ? (
+                      <img
+                        src={c.imageUrl}
+                        alt={c.title}
+                        className="w-12 h-12 rounded-lg object-cover bg-zinc-100 flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-zinc-100" />
+                    )}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{c.title}</div>
+                      <div className="text-sm text-zinc-500">
+                        Qty: {c.qty} × ${Number(c.price || 0).toFixed(2)}
+                      </div>
+                    </div>
+
+                    {/* Subtotal */}
+                    <div className="text-sm font-semibold">
+                      ${(Number(c.price || 0) * (c.qty || 1)).toFixed(2)}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-4 border-t border-zinc-200 pt-4">
+                <div className="flex justify-between items-center text-base font-bold">
+                  <span>Total</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Form */}
+            <PaymentForm
+              onSubmit={processPayment}
+              loading={paymentLoading}
+              total={total}
+            />
           </div>
         )}
       </div>
